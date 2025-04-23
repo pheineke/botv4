@@ -26,7 +26,7 @@ class UserTimeTable(commands.Cog):
 
         user_id = str(user.id)
         if user_id not in data:
-            await interaction.response.send_message("This user does not have a timetable set.")
+            await interaction.response.send_message("This user does not have a timetable set.", ephemeral=True)
             return
 
         timetable_data = data[user_id]
@@ -36,7 +36,8 @@ class UserTimeTable(commands.Cog):
 
         await interaction.response.send_message(
             content=f"Timetable for {user.name}",
-            file=discord.File(png_buffer, filename="timetable.png")
+            file=discord.File(png_buffer, filename="timetable.png"),
+            ephemeral=True
         )
         png_buffer.close()
         
@@ -44,7 +45,7 @@ class UserTimeTable(commands.Cog):
     @app_commands.command(name="my_timetable", description="Set your timetable")
     async def my_timetable(self, interaction: discord.Interaction, file: discord.Attachment):
         if not file.filename.endswith(('.png', '.jpg', '.jpeg')):
-            await interaction.response.send_message("Please upload a valid image file (PNG, JPG, JPEG).")
+            await interaction.response.send_message("Please upload a valid image file (PNG, JPG, JPEG).", ephemeral=True)
             return
         
         try:
@@ -57,7 +58,7 @@ class UserTimeTable(commands.Cog):
             png_buffer.close()
         except Exception as e:
             logger.log(f"Error processing image: {e}")
-            await interaction.response.send_message("There was an error processing the image.")
+            await interaction.response.send_message("There was an error processing the image.", ephemeral=True)
             return
 
         with open(self.timetable_file, "r") as f:
@@ -72,14 +73,14 @@ class UserTimeTable(commands.Cog):
             
         with open(self.timetable_file, "w") as f:
             json.dump(data, f, indent=4)
-        await interaction.response.send_message("Your timetable has been set successfully!")
+        await interaction.response.send_message("Your timetable has been set successfully!", ephemeral=True)
 
     @app_commands.command(name="timetables", description="Get all users that have a timetables")
     async def timetables(self, interaction: discord.Interaction):
         with open(self.timetable_file, "r") as f:
             data = json.load(f)
         if not data:
-            await interaction.response.send_message("No users have set a timetable yet.")
+            await interaction.response.send_message("No users have set a timetable yet.", ephemeral=True)
             return
         
         txt = "Folgende User haben ein Timetable:\n"
@@ -90,7 +91,7 @@ class UserTimeTable(commands.Cog):
             if user:
                 txt += f"- {user.name}\n"
                 
-        await interaction.response.send_message(txt)
+        await interaction.response.send_message(txt, ephemeral=True)
 
 
 
